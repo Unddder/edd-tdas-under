@@ -23,7 +23,7 @@ public class MapTest {
 	private Map<Integer, Integer> getMapeo() {
 
 		Map<Integer, Integer> mapeo = null;
-		//mapeo = new MapeoConHash<Integer, Integer>(); //TODO: Descomentar y crear instancia del TDA a testear
+		mapeo = new TDAMapeo<Integer, Integer>(); //TODO: Descomentar y crear instancia del TDA a testear
 		return mapeo;
 
 	}

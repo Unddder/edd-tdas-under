@@ -1,5 +1,4 @@
 package ar.edu.uns.cs.ed.tdas.tdalista;
-
 import java.util.Iterator;
 
 import ar.edu.uns.cs.ed.tdas.Position;

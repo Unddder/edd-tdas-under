@@ -21,7 +21,7 @@ public class StackTest {
 	private Stack<String> getStack()
 	{
 		Stack<String> pila = null;
-		//pila = new PilaConLista<String>(); //TODO: Descomentar y crear instancia del TDA a testear
+		pila = new TDAPila<String>(); //TODO: Descomentar y crear instancia del TDA a testear
 		return pila;	  
 	 }
 	

@@ -23,7 +23,7 @@ public class DictionaryTest {
 	private Dictionary<Integer, Integer> getDictionary() {
 
 		Dictionary<Integer, Integer> d = null;
-		//d = new DiccionarioHashAbierto<Integer, Integer>(); //TODO: Descomentar y crear instancia del TDA a testear
+		d = new TDADiccionario<Integer, Integer>(); //TODO: Descomentar y crear instancia del TDA a testear
 		return d;
 
 	}
