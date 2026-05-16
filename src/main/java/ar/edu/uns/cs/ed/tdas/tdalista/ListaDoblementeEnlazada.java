@@ -105,6 +105,7 @@ public class ListaDoblementeEnlazada<E> implements PositionList<E> {
         anterior.setSiguiente(siguiente);
         tamaño--;
         return elem;
+        //tiempo O(1)
     }
     public E set(Position<E> p, E elem){
         if (isEmpty()) throw new InvalidPositionException("Lista vacía");

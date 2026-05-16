@@ -66,13 +66,13 @@ public class TDADiccionario<K,V> implements Dictionary<K,V> {
         //arrojar excepción: c2 pero corta el flujo de ejecución, no lo tengo en cuenta
         if(e == null || e.getKey() == null) throw new InvalidEntryException("La clave pasada por parametro es nula");
         //declaración de objeto, indexar un arreglo, seguir referencia de e, 
-        // llamar a un metodo de tiempo constante y llamar a otro de tiempo lineal: c3*n 
+        // llamar a un metodo de tiempo constante y llamar a otro de tiempo constante: c3
         Entry<K,V> eliminado = A[h(e.getKey())].remove(e);
         //decrementar: c4
         n--;
         //retornar: c5
         return eliminado;
-        //c1 + c2 + c3*n + c4 + c5 = O(n)
+        //c1 + c2 + c3 + c4 + c5 = O(1)
     }
 
     public Iterable<Entry<K,V>> entries(){
@@ -92,18 +92,16 @@ public class TDADiccionario<K,V> implements Dictionary<K,V> {
         //llamada al método findAll(c) de tiempo lineal = n
         //peor caso: todas las entradas tienen la clave c
         //cant iteraciones del for = n
-        //tiempo del for: n*c4 + (n(n+1))/2
+        //tiempo del for: n(c4 + c5)
         for(Entry<K,V> e : findAll(c))
             //tiempo de evaluar la condición: c4
             if(e.getValue().equals(v))
                 //rastrear un objeto, llamar a un metodo de tiempo constante y pasarle por parametro
-                //un llamado a un metodo de tiempo lineal: c5*n, pero entonces cada iteración n disminuiria
-                //primero iteraría n veces, despues n-1,..., 1 vez entonces es la sumatoria desde i=0 hasta n de i
-                // esto es (n(n+1)/2)
+                //un llamado a un metodo de tiempo constante: c5.
                 pl.addLast(remove(e));
         //seguir la referencia de un objeto y retornar: c6
         return pl;
-        //c1 + c3 + n + n*c4 + n*(n(n+1))/2 + c6
-        //c1 + c3 + n + c4*n + (n^2 + n)/2 + c6 = O(n^2)
+        //c1 + c3 + n + n*c4 + n*c5 + c6
+        //c1+c3+c6 + n(1+c4+c5) = O(n)
     }
 }
