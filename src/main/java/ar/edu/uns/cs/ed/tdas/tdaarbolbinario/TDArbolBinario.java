@@ -158,29 +158,33 @@ public class TDArbolBinario<E> implements BinaryTree<E> {
         else throw new InvalidPositionException("la posición rb no corresponde al hijo derecho de p");
     }
 
-    public void attach(Position<E> r, BinaryTree<E> T1, BinaryTree<E> T2)throws InvalidPositionException {
+    public void attach(Position<E> r, BinaryTree<E> T1, BinaryTree<E> T2)throws InvalidPositionException { //clona T1 y T2 
         if(isInternal(r)) throw new InvalidPositionException("la posición pasada por parámetro no corresponde a una hoja");
         BTNodo<E> nodo = checkPosition(r);
         tamaño+=T1.size()+T2.size();
         if(!T1.isEmpty()){
             BTNodo<E> raizT1 = (BTNodo<E>) T1.root();
-            raizT1.setPadre(nodo);
+            raizT1 = clonar(raizT1, nodo);
             nodo.setIzq(raizT1);
-            /* 
-            TDArbolBinario<E> T1casteado = (TDArbolBinario<E>) T1;
-            T1casteado.raiz = null;
-            T1casteado.tamaño = 0;
-            */
         }
         if(!T2.isEmpty()){
             BTNodo<E> raizT2 = (BTNodo<E>) T2.root();
-            raizT2.setPadre(nodo);
+            raizT2 = clonar(raizT2, nodo);
             nodo.setDer(raizT2);
-            /* 
-            TDArbolBinario<E> T2casteado = (TDArbolBinario<E>) T2;
-            T2casteado.raiz = null;
-            T2casteado.tamaño = 0;*/
         }
+    }
+
+    private BTNodo<E> clonar(BTNodo<E> nodo, BTNodo<E> padre){
+        if(nodo == null) return null;
+        BTNodo<E> nuevo = new BTNodo<E>(nodo.element());
+        nuevo.setPadre(padre);
+
+        BTNodo<E> hi = clonar(nodo.getIzq(), nuevo);
+        BTNodo<E> hd = clonar(nodo.getDer(), nuevo);
+
+        nuevo.setIzq(hi);
+        nuevo.setDer(hd);
+        return nuevo;
     }
 
     public void removeNode(Position<E> p) throws InvalidPositionException{   
