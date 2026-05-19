@@ -10,9 +10,10 @@ import ar.edu.uns.cs.ed.tdas.excepciones.InvalidOperationException;
 import ar.edu.uns.cs.ed.tdas.excepciones.InvalidPositionException;
 import ar.edu.uns.cs.ed.tdas.tdalista.ListaDoblementeEnlazada;
 import ar.edu.uns.cs.ed.tdas.tdalista.PositionList;
+import ar.edu.uns.cs.ed.tdas.tdamapeo.Map;
+import ar.edu.uns.cs.ed.tdas.tdamapeo.MapeoConLista;
 
 public class TDArbol<E> implements Tree<E> {
-
     protected static class TNodo<E> implements Position<E>{
         private E elemento;
         private TNodo<E> padre;
@@ -304,4 +305,41 @@ public class TDArbol<E> implements Tree<E> {
         return lista.iterator();
         //c1 + c2*n(c3) + c4 = c1 + c$*n + c4 = O(n)
     }
+
+    public void eliminarUltimoHijo(Position<E> p){
+        //tamaño de la entrada n: tamaño del árbol al que hace referencia la posicion p
+        //comparar c1, tirar excepción c2 pero corta el flujo de ejecución
+        if(p == root()) throw new InvalidOperationException("la posición pasada por parámetro corresponde a la raiz");
+        //c3
+        TNodo<E> nodo = checkPosition(p);
+        //c4
+        PositionList<TNodo<E>> hijos = nodo.getPadre().getHijos(); //hermanos de nodo
+        //comparar c5
+        //T_if_thenS1_elseS2(n) = c5 +max(T_S1(n), T_S2(n)) = c5+max(c6+c7+ c8*n + c9*n - 2*c8 - 2*c9 + c10,c11) = O(n)
+        if(hijos.last().element() == nodo) {
+            //c6
+            Position<TNodo<E>> ultimo = hijos.last();
+            //c7
+            PositionList<TNodo<E>> hijosDeNodoInterno = ultimo.element().getHijos();
+            //peor caso: nodo no tiene hermanos y es hijo de la raiz
+            //cant_iteraciones(n) = n-2 (no itera la raiz ni el nodo, solo los hijos de nodo) 
+            //T_for(n) = (n-2)(c8+c9) = (c8+c9)*n - 2*(c8+c9) 
+            for(TNodo<E> h : hijosDeNodoInterno){
+                //c8
+                h.setPadre(nodo.getPadre());
+                //c9
+                hijos.addLast(h);
+            }
+            //c10
+            nodo.setPadre(null);
+            hijos.remove(ultimo);
+            tamaño--;
+            //T_S1(n) = c6+c7+ c8*n + c9*n - 2*c8 - 2*c9 + c10 = O(n)
+        }
+        //T_S2(n) = c11 = O(1)
+        else throw new InvalidPositionException("la posición pasada por parámetro no corresponde al último hijo entre sus hermanos");
+        //c1 + c3 + c4 + c5 + c6+c7+ c8*n + c9*n - 2*c8 - 2*c9 + c10 = c1+c2+c3+c4+c5+c6+c7-2*c8-2*c9+c10 + c8*n+c9*n = O(n)
+    }
+
 }
+
