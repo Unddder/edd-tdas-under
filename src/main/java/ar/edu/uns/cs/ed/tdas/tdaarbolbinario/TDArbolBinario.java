@@ -5,8 +5,11 @@ import ar.edu.uns.cs.ed.tdas.excepciones.EmptyListException;
 import ar.edu.uns.cs.ed.tdas.excepciones.EmptyTreeException;
 import ar.edu.uns.cs.ed.tdas.excepciones.InvalidOperationException;
 import ar.edu.uns.cs.ed.tdas.excepciones.InvalidPositionException;
+import ar.edu.uns.cs.ed.tdas.tdadiccionario.TDADiccionario;
 import ar.edu.uns.cs.ed.tdas.tdalista.ListaDoblementeEnlazada;
 import ar.edu.uns.cs.ed.tdas.tdalista.PositionList;
+
+import ar.edu.uns.cs.ed.tdas.tdadiccionario.Dictionary;
 import java.util.Iterator;
 
 public class TDArbolBinario<E> implements BinaryTree<E> {
@@ -215,5 +218,36 @@ public class TDArbolBinario<E> implements BinaryTree<E> {
     public void removeExternalNode(Position<E> p) throws InvalidPositionException{
         if(!isExternal(p)) throw new InvalidPositionException("p no corresponde a un nodo externo");
         removeNode(p);
+    }
+
+    public Dictionary<E,E> ejercicio2(){
+        Dictionary<E,E> nuevo = new TDADiccionario<E,E>();
+        if(!isEmpty()) prediccionario(nuevo, raiz);
+        return nuevo;
+    }
+
+    private void prediccionario(Dictionary<E,E> diccionario, BTNodo<E> nodo){
+        if(isInternal(nodo)){
+            if(nodo.getIzq() != null){
+                diccionario.insert(nodo.element(), nodo.getIzq().element());
+                prediccionario(diccionario, nodo.getIzq());
+            }
+            if(nodo.getDer() != null){
+                diccionario.insert(nodo.element(), nodo.getDer().element());
+                prediccionario(diccionario, nodo.getDer());
+            }
+        }
+    }
+
+    public void eliminarSubarbol(Position<E> p){
+        PositionList<Position<E>> pl = new ListaDoblementeEnlazada<>();
+        postOrden(pl, p);
+        for(Position<E> pos : pl)
+            removeNode(pos);
+    }
+    private void postOrden(PositionList<Position<E>> pl, Position<E> p){
+        if(hasLeft(p)) postOrden(pl, left(p));
+        if(hasRight(p)) postOrden(pl, right(p));
+        pl.addLast(p);
     }
 }

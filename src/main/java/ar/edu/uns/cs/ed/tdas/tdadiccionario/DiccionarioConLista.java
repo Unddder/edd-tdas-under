@@ -2,6 +2,7 @@ package ar.edu.uns.cs.ed.tdas.tdadiccionario;
 import ar.edu.uns.cs.ed.tdas.Entry;
 import ar.edu.uns.cs.ed.tdas.Position;
 import ar.edu.uns.cs.ed.tdas.tdalista.ListaDoblementeEnlazada;
+import ar.edu.uns.cs.ed.tdas.tdalista.PositionList;
 import ar.edu.uns.cs.ed.tdas.excepciones.InvalidKeyException;
 import ar.edu.uns.cs.ed.tdas.excepciones.InvalidEntryException;
 import java.util.Iterator;
@@ -62,8 +63,8 @@ public class DiccionarioConLista<K,V> implements Dictionary<K,V>{
         //evaluar condición: c1
         //arrojar excepción: c2, pero corta el flujo de ejecución por lo que no la tenemos en cuenta
         if(key == null) throw new InvalidKeyException("La clave pasada por parametro es nula");
-        // declaración del objeto y llamado al constructor de tiempo constante = c3
-        ListaDoblementeEnlazada<Entry<K,V>> nueva = new ListaDoblementeEnlazada<>();
+        // declaración de la variable y llamado al constructor de tiempo constante = c3
+        PositionList<Entry<K,V>> nueva = new ListaDoblementeEnlazada<>();
         //cant iteraciones del for: n
         //tiempo del cuerpo del for: c4+c5
         // tiempo del for: n*(c4+c5)
