@@ -7,10 +7,9 @@ import ar.edu.uns.cs.ed.tdas.excepciones.InvalidEdgeException;
 import ar.edu.uns.cs.ed.tdas.excepciones.InvalidVertexException;
 import ar.edu.uns.cs.ed.tdas.tdalista.ListaDoblementeEnlazada;
 import ar.edu.uns.cs.ed.tdas.tdalista.PositionList;
-import ar.edu.uns.cs.ed.tdas.tdamapeo.TDAMapeo;
 
-public class GrafoConMatriz<V,E> implements Graph<V,E> {
-    protected  class Vertice<V> extends TDAMapeo<Object,Object> implements Vertex<V> {
+public class GrafoConMatrizDirigido<V,E> implements GraphD<V,E> {
+    protected  class Vertice<V> implements Vertex<V> {
         private Position<Vertex<V>> posicionEnListaVertices;
         private V rotulo;
         private int indice;
@@ -30,22 +29,22 @@ public class GrafoConMatriz<V,E> implements Graph<V,E> {
    }
     protected class Arco<V,E> implements Edge<E>{
         private Position<Edge<E>> posicionEnListaArco;
-        private Vertice<V> v1,v2;
+        private Vertice<V> origen,destino;
         private E rotulo;
 
-        public Arco(E rotulo, Vertice<V> v1, Vertice<V> v2){
+        public Arco(E rotulo, Vertice<V> origen, Vertice<V> destino){
             this.rotulo = rotulo;
-            this.v1 = v1;
-            this.v2 = v2;
+            this.origen = origen;
+            this.destino = destino;
         }
 
         //setters y getters
         public E element(){return rotulo;}
-        public Vertice<V> getV1(){return v1;}
-        public Vertice<V> getV2(){return v2;}
+        public Vertice<V> getOrigen(){return origen;}
+        public Vertice<V> getDestino(){return destino;}
         public Position<Edge<E>> getPosicionEnListaArco(){return posicionEnListaArco;}
-        public void setV1(Vertice<V> v){v1 = v;}
-        public void setV2(Vertice<V> v){v2 = v;}
+        public void setOrigen(Vertice<V> v){origen = v;}
+        public void setDestino(Vertice<V> v){destino = v;}
         public void setPosicionEnlistaArco(Position<Edge<E>> p){posicionEnListaArco = p;}
         public void setRotulo(E rotulo){this.rotulo = rotulo;}
     }
@@ -76,7 +75,7 @@ public class GrafoConMatriz<V,E> implements Graph<V,E> {
                 nuevo[i][j] = matriz[i][j];
         matriz = nuevo;
     }
-    public GrafoConMatriz(){ //10 por convención
+    public GrafoConMatrizDirigido(){ //10 por convención
         vertices = new ListaDoblementeEnlazada<Vertex<V>>();
         arcos = new ListaDoblementeEnlazada<Edge<E>>();
         matriz = (Edge<E> [][]) new Arco[10][10];
@@ -90,13 +89,13 @@ public class GrafoConMatriz<V,E> implements Graph<V,E> {
         return vv;
     }
 
-    public Edge<E> insertEdge(Vertex<V> v, Vertex<V> w, E x){
-        Vertice<V> vv = checkVertex(v);
-        Vertice<V> ww = checkVertex(w);
+    public Edge<E> insertEdge(Vertex<V> origen, Vertex<V> destino, E x){
+        Vertice<V> vv = checkVertex(origen);
+        Vertice<V> ww = checkVertex(destino);
         int fila = vv.getIndice();
         int col = ww.getIndice();
         Arco<V,E> arco = new Arco(x, vv,ww);
-        matriz[fila][col] = matriz[col][fila] = arco;
+        matriz[fila][col] = arco;
         arcos.addLast(arco);
         arco.setPosicionEnlistaArco(arcos.last());
         return arco;
@@ -121,22 +120,24 @@ public class GrafoConMatriz<V,E> implements Graph<V,E> {
         Vertice<V> vv = checkVertex(v);
         int i = vv.getIndice();
         PositionList<Edge<E>> pl = new ListaDoblementeEnlazada<Edge<E>>();
-        for(int j=0; j<cantidadVertices; j++)
+        for(int j=0; j<cantidadVertices; j++){
             if(matriz[i][j] != null) pl.addLast(matriz[i][j]);
+            if(i != j && matriz[j][i] != null) pl.addLast(matriz[j][i]);
+        }
         return pl;
     }
 
     public Vertex<V> opposite(Vertex<V> v, Edge<E> e){
         Vertice<V> vv = checkVertex(v);
         Arco<V,E> ee = checkEdge(e);
-        if(ee.getV1() == vv) return ee.getV2();
-        if(ee.getV2() == vv) return ee.getV1();
+        if(ee.getOrigen() == vv) return ee.getDestino();
+        if(ee.getDestino() == vv) return ee.getOrigen();
         throw new InvalidEdgeException("el vertice no corresponde al arco");
     }
     public Vertex<V>[] endvertices(Edge<E> e){
         Vertex<V>[] arr = (Vertex<V>[]) new Vertice[2];
         Arco<V,E> ee = checkEdge(e);
-        arr[0] = ee.getV1(); arr[1] = ee.getV2();
+        arr[0] = ee.getOrigen(); arr[1] = ee.getDestino();
         return arr;
     }
 
@@ -147,9 +148,9 @@ public class GrafoConMatriz<V,E> implements Graph<V,E> {
     }
     public E removeEdge(Edge<E> e){
         Arco<V,E> ee = checkEdge(e);
-        int fila = ee.getV1().getIndice();
-        int columna = ee.getV2().getIndice();
-        matriz[fila][columna] = matriz[columna][fila] = null;
+        int fila = ee.getOrigen().getIndice();
+        int columna = ee.getDestino().getIndice();
+        matriz[fila][columna] = null;
         arcos.remove(ee.getPosicionEnListaArco());
         return e.element();
     }
@@ -174,10 +175,11 @@ public class GrafoConMatriz<V,E> implements Graph<V,E> {
                     encontreVertice = true;
                 }
             }
-            for(int i = 0; i<cantidadVertices; i++){
-                matriz[indiceV][i] = matriz[ultimoIndice][i];
+            for(int j = 0; j<cantidadVertices; j++)
+                matriz[indiceV][j] = matriz[ultimoIndice][j];
+            for(int i=0; i< cantidadVertices; i++)
                 matriz[i][indiceV] = matriz[i][ultimoIndice];
-            }
+            
             ultimoVertice.setIndice(indiceV);
         }
         for(int i=0; i<cantidadVertices; i++){
@@ -200,5 +202,14 @@ public class GrafoConMatriz<V,E> implements Graph<V,E> {
         return temp;
     }
 
+    public Iterable<Edge<E>> succesorEdges(Vertex<V> v){
+        Vertice<V> vv = checkVertex(v);
+        int i = vv.getIndice();
+        PositionList<Edge<E>> pl = new ListaDoblementeEnlazada<Edge<E>>();
+        for(int j=0; j<cantidadVertices; j++)
+            if(matriz[i][j] != null)
+                pl.addLast(matriz[i][j]);
+        return pl;
+    }
     
 }
